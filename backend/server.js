@@ -2,6 +2,7 @@ const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 // const syncDB = require('./config/syncdb');
 
 const userRouter = require('./routes/user');
@@ -9,12 +10,14 @@ const authRouter = require('./routes/auth');
 const prodRouter = require('./routes/product');
 
 const app = express();
+
 dotenv.config();
 // syncDB();
 
 const PORT = process.env.PORT || 5001;
 
 // Middleware
+app.use(cookieParser());
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));

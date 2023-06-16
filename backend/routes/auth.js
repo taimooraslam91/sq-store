@@ -13,10 +13,6 @@ router.post('/signin', AuthController.signin);
 router.post('/logout', AuthController.logoutUser);
 
 // Protected route - example
-router.get(
-  '/profile',
-  AuthMiddleware.authenticateToken,
-  AuthController.profile,
-);
+router.get('/profile', AuthMiddleware.protect, AuthController.profile);
 
 module.exports = router;

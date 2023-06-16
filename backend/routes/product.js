@@ -10,7 +10,8 @@ router.get('/:id', ProductController.getProductById);
 
 router.post(
   '/',
-  AuthMiddleware.authenticateToken,
+  AuthMiddleware.protect,
+  AuthMiddleware.admin,
   ProductController.createProduct,
 );
 

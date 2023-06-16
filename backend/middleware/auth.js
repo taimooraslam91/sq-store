@@ -1,24 +1,33 @@
-const jwtSecretKey = process.env.JWT_SECRET || 'your-secret-key';
+const Helper = require('../utils/helper');
 
-const authenticateToken = (req, res, next) => {
+const protect = async (req, res, next) => {
   const token = req.cookies.jwt;
-  console.log('token', token);
-
   if (!token) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
-  jwt.verify(token, jwtSecretKey, (err, user) => {
-    if (err) {
-      return res.status(403).json({ error: 'Invalid token' });
-    }
-    console.log(user);
+  const verificationResult = await Helper.verifyToken(token);
 
-    req.user = user;
+  if (verificationResult.success) {
+    const user = verificationResult.user;
+    // Token is valid, continue with the user data
+    req.user = user.user;
     next();
-  });
+  } else {
+    // Token is invalid, handle the error
+    return res.status(401).json({ error: verificationResult.error });
+  }
+};
+
+const admin = (req, res, next) => {
+  if (req.user && req.user.isAdmin) {
+    next();
+  } else {
+    return res.status(401).json({ error: 'Not authorized as an admin' });
+  }
 };
 
 module.exports = {
-  authenticateToken,
+  protect,
+  admin,
 };

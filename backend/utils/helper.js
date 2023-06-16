@@ -1,10 +1,12 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+const dotenv = require('dotenv');
 
-const jwtSecretKey = process.env.JWT_SECRET || 'your-secret-key';
+dotenv.config();
+const jwtSecretKey = process.env.JWT_SECRET;
 
-function generateToken(res, userId) {
-  const token = jwt.sign({ userId }, process.env.JWT_SECRET, {
+function generateToken(res, user) {
+  const token = jwt.sign({ user }, jwtSecretKey, {
     expiresIn: '30d',
   });
 
@@ -17,9 +19,14 @@ function generateToken(res, userId) {
   });
 }
 
-function verifyToken(token) {
-  return jwt.verify(token, jwtSecretKey);
-}
+const verifyToken = async (token) => {
+  try {
+    const user = await jwt.verify(token, jwtSecretKey);
+    return { success: true, user };
+  } catch (err) {
+    return { success: false, error: 'Invalid token' };
+  }
+};
 
 const verifyPassword = async (enteredPassword, hashPassword) => {
   return await bcrypt.compare(enteredPassword, hashPassword);
@@ -29,4 +36,22 @@ const generateHash = async (plainPassword) => {
   return await bcrypt.hash(plainPassword, 10);
 };
 
-module.exports = { generateToken, verifyToken, verifyPassword, generateHash };
+const getAuthTokenFromHeaders = (headers) => {
+  const authHeader = headers.authorization;
+
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    // Extract the token from the "Bearer" scheme
+    const authToken = authHeader.split(' ')[1];
+    return authToken;
+  }
+
+  return null;
+};
+
+module.exports = {
+  generateToken,
+  verifyToken,
+  verifyPassword,
+  generateHash,
+  getAuthTokenFromHeaders,
+};

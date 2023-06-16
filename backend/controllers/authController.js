@@ -18,16 +18,16 @@ const signin = async (req, res) => {
     if (!passwordMatch) {
       return res.status(401).json({ error: 'Invalid password' });
     }
-
-    // Generate a JWT token in cookies
-    Helper.generateToken(res, user.id);
-
-    res.json({
+    const userData = {
       id: user.id,
       name: user.name,
       email: user.email,
       isAdmin: user.isAdmin,
-    });
+    };
+    // Generate a JWT token in cookies
+    Helper.generateToken(res, userData);
+
+    res.json(userData);
   } catch (error) {
     res.status(500).json({ error: 'Failed to signin' });
   }
@@ -48,20 +48,20 @@ const signup = async (req, res) => {
 
     // Hash the password
     const hashedPassword = await Helper.generateHash(password);
-    console.log(hashedPassword);
 
     // Create a new user in the database
     const user = await User.create({ name, email, password: hashedPassword });
 
-    // Generate a JWT token in cookies
-    Helper.generateToken(res, user.id);
-
-    res.json({
+    const userData = {
       id: user.id,
       name: user.name,
       email: user.email,
       isAdmin: user.isAdmin,
-    });
+    };
+    // Generate a JWT token in cookies
+    Helper.generateToken(res, userData);
+
+    res.json(userData);
   } catch (error) {
     res.status(500).json({ error: 'Failed to create user' });
   }

@@ -1,5 +1,5 @@
 const { User } = require('../models');
-const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 
 const createUser = async (req, res) => {
   try {
@@ -89,22 +89,10 @@ const deleteUser = async (req, res) => {
   }
 };
 
-const profile = async (req, res) => {
-  try {
-    // Get the authenticated user from the request object
-    const user = req.user;
-
-    res.json(user);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to retrieve user profile' });
-  }
-};
-
 module.exports = {
   createUser,
   getAllUsers,
   getUserById,
   updateUser,
   deleteUser,
-  profile,
 };

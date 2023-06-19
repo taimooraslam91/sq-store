@@ -45,7 +45,7 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: 0,
         allowNull: false,
       },
-      noOfReviews: {
+      numReviews: {
         type: DataTypes.INTEGER,
         defaultValue: 0,
         allowNull: false,

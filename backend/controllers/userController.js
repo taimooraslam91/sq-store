@@ -1,93 +1,104 @@
 const { User } = require('../models');
-const bcrypt = require('bcrypt');
+const asyncHandler = require('../middlewares/asyncHandler');
 
-const createUser = async (req, res) => {
-  try {
-    // Extract user data from request body
-    const { name, email, password } = req.body;
+const createUser = asyncHandler(async (req, res) => {
+  // Extract user data from request body
+  const { name, email, password } = req.body;
 
-    // Create a new user in the database
-    const user = await User.create({ name, email, password });
-
-    res.status(201).json(user);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to create user' });
+  // Create a new user in the database
+  const user = await User.create({ name, email, password });
+  if (user) {
+    res.status(201).json({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+    });
+  } else {
+    res.status(500);
+    throw new Error('Invalid user data');
   }
-};
+});
 
-const getAllUsers = async (req, res) => {
-  try {
-    // Retrieve all users from the database
-    const users = await User.findAll();
-
-    res.json(users);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to retrieve users' });
+const getAllUsers = asyncHandler(async (req, res) => {
+  // Retrieve all users from the database
+  const users = await User.findAll();
+  if (users) {
+    res.status(200).json(users);
+  } else {
+    res.status(500);
+    throw new Error('Failed to retrieve users');
   }
-};
+});
 
-const getUserById = async (req, res) => {
-  try {
-    const { id } = req.params;
+const getUserById = asyncHandler(async (req, res) => {
+  const { id } = req.params;
 
-    // Find a user by ID in the database
-    const user = await User.findByPk(id);
+  // Find a user by ID in the database
+  const user = await User.findByPk(id);
 
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-
-    res.json(user);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to retrieve user' });
+  if (user) {
+    res.json({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      isAdmin: user.isAdmin,
+    });
+  } else {
+    res.status(404);
+    throw new Error('User not found');
   }
-};
+});
 
-const updateUser = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { name, email, password } = req.body;
+const updateUser = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { name, email, password } = req.body;
 
-    // Find a user by ID in the database
-    const user = await User.findByPk(id);
+  // Find a user by ID in the database
+  const user = await User.findByPk(id);
 
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-
-    // Update user data
-    user.name = name;
-    user.email = email;
-    user.password = password;
-
-    // Save the updated user in the database
-    await user.save();
-
-    res.json(user);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to update user' });
+  // If the user doesn't exist, return an error
+  if (!user) {
+    res.status(404);
+    throw new Error('User not found');
   }
-};
 
-const deleteUser = async (req, res) => {
-  try {
-    const { id } = req.params;
+  // Update the user's information
+  await User.update({ name, email, password }, { where: { id } });
 
-    // Find a user by ID in the database
-    const user = await User.findByPk(id);
+  // Fetch the updated user
+  const updated_user = await User.findByPk(id);
 
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
+  res.json({
+    id: updated_user.id,
+    name: updated_user.name,
+    email: updated_user.email,
+    isAdmin: updated_user.isAdmin,
+  });
+});
 
-    // Delete the user
-    await user.destroy();
+const deleteUser = asyncHandler(async (req, res) => {
+  const { id } = req.params;
 
-    res.json({ message: 'User deleted successfully' });
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to delete user' });
+  // Find a user by ID in the database
+  const user = await User.findByPk(id);
+
+  if (!user) {
+    res.status(404);
+    throw new Error('User not found');
   }
-};
+  // Delete the user
+  const isDeleted = await User.destroy({
+    where: {
+      id: id,
+    },
+  });
+  if (isDeleted) {
+    res.status(200).json({ message: 'User deleted successfully' });
+  } else {
+    res.status(500);
+    throw new Error('Failed to delete user');
+  }
+});
 
 module.exports = {
   createUser,

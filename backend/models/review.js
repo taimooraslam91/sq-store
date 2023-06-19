@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
       },
       rating: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.FLOAT,
         allowNull: false,
       },
       review: {
@@ -32,6 +32,7 @@ module.exports = (sequelize, DataTypes) => {
 
   Review.associate = function (models) {
     Review.belongsTo(models.Product, { foreignKey: 'productId' });
+    Review.belongsTo(models.User, { foreignKey: 'userId' });
   };
 
   return Review;

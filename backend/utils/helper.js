@@ -33,6 +33,12 @@ const verifyPassword = async (enteredPassword, hashPassword) => {
 };
 
 const generateHash = async (plainPassword) => {
+  // Check if the plainPassword starts with the bcrypt hash prefix
+  if (plainPassword.startsWith('$2a$10$')) {
+    return plainPassword; // Already hashed, return as is
+  }
+
+  // Hash the plainPassword using bcrypt
   return await bcrypt.hash(plainPassword, 10);
 };
 

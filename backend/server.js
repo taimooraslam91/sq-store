@@ -3,6 +3,9 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
+const logger = require('morgan');
+const errorHandler = require('./middlewares/errorHandler');
+
 // const syncDB = require('./config/syncdb');
 
 const userRouter = require('./routes/user');
@@ -17,6 +20,7 @@ dotenv.config();
 const PORT = process.env.PORT || 5001;
 
 // Middleware
+app.use(logger('dev'));
 app.use(cookieParser());
 app.use(cors());
 app.use(bodyParser.json());
@@ -29,6 +33,8 @@ app.get('/', (req, res) => {
 app.use('/api/user', userRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/product', prodRouter);
+
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`App backend listening on port ${PORT}`);

@@ -11,6 +11,7 @@ const errorHandler = require('./middlewares/errorHandler');
 const userRouter = require('./routes/user');
 const authRouter = require('./routes/auth');
 const prodRouter = require('./routes/product');
+const orderRouter = require('./routes/order');
 
 const app = express();
 
@@ -33,6 +34,7 @@ app.get('/', (req, res) => {
 app.use('/api/user', userRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/product', prodRouter);
+app.use('/api/order', orderRouter);
 
 app.use(errorHandler);
 

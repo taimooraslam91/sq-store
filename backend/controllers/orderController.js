@@ -1,5 +1,5 @@
 const asyncHandler = require('../middlewares/asyncHandler');
-const { Order, OrderItem, Product } = require('../models');
+const { Order, OrderItem, Product, User } = require('../models');
 
 const getMyOrders = asyncHandler(async (req, res) => {
   // Get the logged-in user's ID from the authentication middleware or session
@@ -22,13 +22,26 @@ const getMyOrders = asyncHandler(async (req, res) => {
 
 const getOrderById = asyncHandler(async (req, res) => {
   // Get the logged-in user's ID from the authentication middleware or session
-  const { id } = req.params.id;
-
+  const { id } = req.params;
+  console.log('getOrderById', id);
   // Retrieve the user's orders from the database
-  const order = await Order.findByPK(id);
+  const order = await Order.findOne({
+    where: { id },
+    include: [
+      {
+        model: User,
+        as: 'User',
+        attributes: ['id', 'name', 'email'],
+      },
+      {
+        model: OrderItem,
+        as: 'OrderItems',
+      },
+    ],
+  });
 
   if (order) {
-    res.status(200).json(orders);
+    res.status(200).json(order);
   } else {
     res.status(404);
     throw new Error('Order not found');
@@ -62,14 +75,14 @@ const createOrder = asyncHandler(async (req, res) => {
   if (order) {
     // Create order items
     for (const orderItem of orderItems) {
-      const { productId, quantity } = orderItem;
+      const { id: productId, qty } = orderItem;
       const product = await Product.findByPk(productId);
 
       if (product) {
         await OrderItem.create({
           orderId: order.id,
           productId,
-          qty: quantity,
+          qty: qty,
           price: product.price,
           name: product.name,
           image: product.image,

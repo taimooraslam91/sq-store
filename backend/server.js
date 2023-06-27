@@ -6,7 +6,7 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const errorHandler = require('./middlewares/errorHandler');
 
-// const syncDB = require('./config/syncdb');
+const syncDB = require('./config/syncdb');
 
 const userRouter = require('./routes/user');
 const authRouter = require('./routes/auth');

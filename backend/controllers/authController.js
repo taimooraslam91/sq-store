@@ -1,4 +1,5 @@
 const { User } = require('../models');
+const asyncHandler = require('../middlewares/asyncHandler');
 const Helper = require('../utils/helper');
 
 const signin = async (req, res) => {
@@ -25,9 +26,9 @@ const signin = async (req, res) => {
       isAdmin: user.isAdmin,
     };
     // Generate a JWT token in cookies
-    Helper.generateToken(res, userData);
+    const token = Helper.generateToken(res, userData);
 
-    res.json(userData);
+    res.json({ token, ...userData });
   } catch (error) {
     res.status(500).json({ error: 'Failed to signin' });
   }
@@ -59,9 +60,9 @@ const signup = async (req, res) => {
       isAdmin: user.isAdmin,
     };
     // Generate a JWT token in cookies
-    Helper.generateToken(res, userData);
+    const token = Helper.generateToken(res, userData);
 
-    res.json(userData);
+    res.json({ token, ...userData });
   } catch (error) {
     res.status(500).json({ error: 'Failed to create user' });
   }
@@ -78,6 +79,35 @@ const profile = async (req, res) => {
   }
 };
 
+const updateProfile = asyncHandler(async (req, res) => {
+  // Get user information from request body
+  const { name, email, password } = req.body;
+
+  // Find the user by ID
+  const user = await User.findByPk(req.user.id);
+
+  if (user) {
+    // Update user profile information
+    user.name = name;
+    user.email = email;
+    if (password) {
+      user.password = password;
+    }
+
+    // Save the updated user
+    await user.save();
+
+    res.json({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+    });
+  } else {
+    res.status(404);
+    throw new Error('User not found');
+  }
+});
+
 const logoutUser = (req, res) => {
   res.cookie('jwt', '', {
     httpOnly: true,
@@ -90,5 +120,6 @@ module.exports = {
   signin,
   signup,
   profile,
+  updateProfile,
   logoutUser,
 };

@@ -12,7 +12,10 @@ router.post('/signin', AuthController.signin);
 // Logout route
 router.post('/logout', AuthController.logoutUser);
 
-// Protected route - example
+// get user profile
 router.get('/profile', AuthMiddleware.protect, AuthController.profile);
+
+// Update user profile
+router.put('/profile', AuthMiddleware.protect, AuthController.updateProfile);
 
 module.exports = router;

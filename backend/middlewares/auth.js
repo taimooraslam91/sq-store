@@ -1,7 +1,7 @@
 const Helper = require('../utils/helper');
 
 const protect = async (req, res, next) => {
-  const token = req.cookies.jwt;
+  const token = req.cookies.jwt || req.headers.authorization;
   if (!token) {
     return res.status(401).json({ error: 'Unauthorized' });
   }

@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
@@ -12,6 +13,7 @@ const userRouter = require('./routes/user');
 const authRouter = require('./routes/auth');
 const prodRouter = require('./routes/product');
 const orderRouter = require('./routes/order');
+const uploadRouter = require('./routes/upload');
 
 const app = express();
 
@@ -27,14 +29,27 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.get('/', (req, res) => {
-  res.send('API running');
-});
-
 app.use('/api/user', userRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/product', prodRouter);
 app.use('/api/order', orderRouter);
+app.use('/api/upload', uploadRouter);
+
+if (process.env.NODE_ENV === 'production') {
+  const __dirname = path.resolve();
+  app.use('/uploads', express.static('/var/data/uploads'));
+  app.use(express.static(path.join(__dirname, '/frontend/build')));
+
+  app.get('*', (req, res) =>
+    res.sendFile(path.resolve(__dirname, 'frontend', 'build', 'index.html')),
+  );
+} else {
+  const __dirname = path.resolve();
+  app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
+  app.get('/', (req, res) => {
+    res.send('API is running....');
+  });
+}
 
 app.use(errorHandler);
 

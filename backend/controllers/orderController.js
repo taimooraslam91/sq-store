@@ -20,6 +20,27 @@ const getMyOrders = asyncHandler(async (req, res) => {
   res.status(200).json(order);
 });
 
+const getAllOrders = asyncHandler(async (req, res) => {
+  // Retrieve all orders from the database
+  const orders = await Order.findAll({
+    include: [
+      {
+        model: User,
+        attributes: ['id', 'name', 'email'],
+      },
+      {
+        model: OrderItem,
+        include: {
+          model: Product,
+          attributes: ['id', 'name', 'price', 'image'],
+        },
+      },
+    ],
+  });
+
+  res.json(orders);
+});
+
 const getOrderById = asyncHandler(async (req, res) => {
   // Get the logged-in user's ID from the authentication middleware or session
   const { id } = req.params;
@@ -144,6 +165,7 @@ const updateOrderToPaid = asyncHandler(async (req, res) => {
 });
 
 module.exports = {
+  getAllOrders,
   getMyOrders,
   getOrderById,
   createOrder,

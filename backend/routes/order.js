@@ -6,6 +6,9 @@ const { protect, admin } = require('../middlewares/auth');
 // Get user orders
 router.get('/mine', protect, OrderController.getMyOrders);
 
+// Get all orders
+router.get('/', protect, admin, OrderController.getAllOrders);
+
 // Get order by id
 router.get('/:id', protect, OrderController.getOrderById);
 

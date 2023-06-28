@@ -19,6 +19,7 @@ const getProducts = asyncHandler(async (req, res) => {
     },
     offset,
     limit,
+    order: [['updatedAt', 'DESC']],
   });
   if (products) {
     res.json({
@@ -151,6 +152,16 @@ const createProductReview = asyncHandler(async (req, res) => {
   }
 });
 
+const getTopProducts = asyncHandler(async (req, res) => {
+  // Retrieve the top 4 products based on their ratings
+  const topProducts = await Product.findAll({
+    order: [['rating', 'DESC']],
+    limit: 4,
+  });
+
+  res.json(topProducts);
+});
+
 module.exports = {
   getProducts,
   getProductById,
@@ -158,4 +169,5 @@ module.exports = {
   updateProduct,
   deleteProduct,
   createProductReview,
+  getTopProducts,
 };

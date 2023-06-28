@@ -10,14 +10,16 @@ const signin = async (req, res) => {
     const user = await User.findOne({ where: { email } });
 
     if (!user) {
-      return res.status(404).json({ error: 'User not exist with this email' });
+      return res
+        .status(404)
+        .json({ message: 'User not exist with this email' });
     }
 
     // Check if the password is correct
     const passwordMatch = await Helper.verifyPassword(password, user.password);
 
     if (!passwordMatch) {
-      return res.status(401).json({ error: 'Invalid password' });
+      return res.status(401).json({ message: 'Invalid password' });
     }
     const userData = {
       id: user.id,
@@ -30,7 +32,7 @@ const signin = async (req, res) => {
 
     res.json({ token, ...userData });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to signin' });
+    res.status(500).json({ message: 'Failed to signin' });
   }
 };
 
@@ -64,7 +66,7 @@ const signup = async (req, res) => {
 
     res.json({ token, ...userData });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to create user' });
+    res.status(500).json({ message: 'Failed to create user' });
   }
 };
 
@@ -75,7 +77,7 @@ const profile = async (req, res) => {
 
     res.json(user);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to retrieve user profile' });
+    res.status(500).json({ message: 'Failed to retrieve user profile' });
   }
 };
 

@@ -2,12 +2,13 @@ import PropTypes from 'prop-types';
 import { Card } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import Rating from './Rating';
+import { BASE_URL } from '../constants';
 
 const Product = ({ product }) => {
   return (
     <Card className="my-3 p-3 rounded">
       <Link to={`/product/${product.id}`}>
-        <Card.Img src={product.image} variant="top" />
+        <Card.Img src={`${BASE_URL}${product.image}`} variant="top" />
       </Link>
 
       <Card.Body>

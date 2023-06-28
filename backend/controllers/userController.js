@@ -51,7 +51,7 @@ const getUserById = asyncHandler(async (req, res) => {
 
 const updateUser = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const { name, email, password } = req.body;
+  const { name, email, password, isAdmin } = req.body;
 
   // Find a user by ID in the database
   const user = await User.findByPk(id);
@@ -63,7 +63,7 @@ const updateUser = asyncHandler(async (req, res) => {
   }
 
   // Update the user's information
-  await User.update({ name, email, password }, { where: { id } });
+  await User.update({ name, email, password, isAdmin }, { where: { id } });
 
   // Fetch the updated user
   const updated_user = await User.findByPk(id);
